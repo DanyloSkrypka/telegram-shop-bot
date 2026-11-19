@@ -8,7 +8,7 @@ Product questions are answered by an **AI assistant** (Claude) — with a built-
 
 ![Demo: order and pay in the chat, owner gets the order](docs/demo.gif)
 
-▶️ **Full demo video (50 s, 1080p):**
+▶️ **Full demo video (about 48 s, 1080p 60 fps):**
 
 https://github.com/user-attachments/assets/dfcf65df-ae3c-4479-8123-c492880a5344
 
@@ -38,9 +38,11 @@ https://github.com/user-attachments/assets/dfcf65df-ae3c-4479-8123-c492880a5344
 
 ## Screenshots
 
-| Catalog & cart | Telegram Stars payment | Owner alert & AI answer |
-|---|---|---|
-| ![](docs/screenshots/01-catalog-cart.png) | ![](docs/screenshots/02-stars-payment.png) | ![](docs/screenshots/03-admin-order-ai-answer.png) |
+| Catalog & cart | Telegram Stars payment |
+|---|---|
+| ![Catalog & cart](docs/screenshots/01-catalog-cart.png) | ![Telegram Stars payment](docs/screenshots/02-stars-payment.png) |
+| **Owner alert & AI answer** | **Summary** |
+| ![Owner alert & AI answer](docs/screenshots/03-admin-order-ai-answer.png) | ![Summary card](docs/screenshots/04-end-card.png) |
 
 ## Tech stack
 
