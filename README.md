@@ -8,7 +8,9 @@ Product questions are answered by an **AI assistant** (Claude) — with a built-
 
 ![Demo: order and pay in the chat, owner gets the order](docs/demo.gif)
 
-▶️ **Full demo video (50 s, 1080p):** [demo.mp4](demo.mp4)
+▶️ **Full demo video (50 s, 1080p):**
+
+https://github.com/user-attachments/assets/dfcf65df-ae3c-4479-8123-c492880a5344
 
 ## Features
 
