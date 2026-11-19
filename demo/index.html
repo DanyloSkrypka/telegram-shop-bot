@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telegram Shop Bot — live demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #111a2e;
+    --ink: #e8eefc;
+    --muted: #8b9bbd;
+    --accent: #3ea6ff;
+    --star: #ffb800;
+    --tg-header: #ffffff;
+    --tg-in: #ffffff;
+    --tg-out: #e3fbd0;
+    --tg-btn: rgba(43, 72, 52, .42);
+    --tg-text: #0f1419;
+    --tg-sub: #6d7f8f;
+    --tg-link: #2481cc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: Inter, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(1200px 700px at 75% 20%, #1b2c52 0%, transparent 60%),
+                radial-gradient(900px 600px at 10% 90%, #13324a 0%, transparent 55%), var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+  }
+  .stage {
+    height: 100vh; display: grid; grid-template-columns: minmax(380px, 560px) auto auto;
+    gap: 56px; align-items: center; justify-content: center; padding: 32px;
+  }
+
+  /* ---------- left info panel ---------- */
+  .info h1 { font-size: 46px; line-height: 1.05; font-weight: 800; letter-spacing: -1px; }
+  .info h1 span { color: var(--accent); }
+  .info .lead { margin-top: 16px; font-size: 19px; color: var(--muted); line-height: 1.45; }
+  .steps { margin-top: 34px; list-style: none; display: grid; gap: 10px; }
+  .steps li {
+    display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 14px;
+    font-size: 18px; font-weight: 600; color: var(--muted); background: transparent;
+    border: 1px solid transparent; transition: all .35s ease;
+  }
+  .steps li b {
+    width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 15px; background: #1c2742; color: var(--muted); flex: none; transition: all .35s;
+  }
+  .steps li.done { color: #b9c6e4; }
+  .steps li.done b { background: #1f6f4a; color: #fff; }
+  .steps li.active { color: #fff; background: var(--panel); border-color: #2a3a63;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  .steps li.active b { background: var(--accent); color: #fff; }
+  .chips { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips span { font-size: 14px; font-weight: 600; padding: 7px 12px; border-radius: 999px;
+    background: #16213a; border: 1px solid #263559; color: #c6d3f0; }
+
+  /* ---------- phones ---------- */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .phone-label { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); }
+  .phone-label i { font-style: normal; color: var(--accent); }
+  .phone {
+    width: 410px; height: 880px; max-height: calc(100vh - 90px); border-radius: 46px; padding: 12px;
+    background: #05070c; box-shadow: 0 0 0 2px #2a3352, 0 40px 80px rgba(0,0,0,.55);
+    position: relative;
+  }
+  .screen { width: 100%; height: 100%; border-radius: 36px; overflow: hidden; display: flex;
+    flex-direction: column; background: #fff; position: relative; }
+  .tg-head { display: flex; align-items: center; gap: 12px; padding: 40px 16px 12px;
+    background: var(--tg-header); border-bottom: 1px solid #e6ebef; z-index: 2; }
+  .tg-head .back { color: var(--tg-link); font-size: 26px; line-height: 1; width: 16px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 22px; background: linear-gradient(135deg, #8a5a3b, #c58b5b); flex: none; }
+  .avatar.admin { background: linear-gradient(135deg, #3a6ea5, #64a7e6); }
+  .tg-title { font-weight: 700; font-size: 16px; color: var(--tg-text); }
+  .tg-sub { font-size: 13px; color: var(--tg-sub); margin-top: 2px; }
+  .tg-sub.typing { color: var(--tg-link); }
+  .chat {
+    flex: 1; overflow-y: auto; padding: 14px 10px 10px; display: flex; flex-direction: column; gap: 6px;
+    background-color: #b9cfa4;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,.22) 0 2px, transparent 3px),
+      radial-gradient(circle at 70% 60%, rgba(255,255,255,.18) 0 2px, transparent 3px),
+      linear-gradient(160deg, #cfe0b4 0%, #a9c79a 55%, #93b99a 100%);
+    background-size: 46px 46px, 62px 62px, 100% 100%;
+    scrollbar-width: none;
+  }
+  .chat::-webkit-scrollbar { display: none; }
+  .msg { max-width: 86%; display: flex; flex-direction: column; gap: 4px; animation: pop .22s ease-out; }
+  .msg.in { align-self: flex-start; }
+  .msg.in:has(.kb) { width: 86%; }
+  .msg.out { align-self: flex-end; }
+  .bubble { padding: 8px 12px 6px; border-radius: 16px; font-size: 15px; line-height: 1.38;
+    color: var(--tg-text); box-shadow: 0 1px 1px rgba(0,0,0,.12); word-wrap: break-word; }
+  .in .bubble { background: var(--tg-in); border-bottom-left-radius: 6px; }
+  .out .bubble { background: var(--tg-out); border-bottom-right-radius: 6px; }
+  .bubble .time { float: right; font-size: 11px; color: #8fa0ad; margin: 6px 0 -2px 10px; }
+  .out .bubble .time { color: #5fae5a; }
+  .kb { display: flex; flex-direction: column; gap: 4px; }
+  .kb .row { display: flex; gap: 4px; }
+  .kb button {
+    flex: 1; border: 0; border-radius: 10px; padding: 9px 6px; font: 600 14px Inter, sans-serif;
+    color: #fff; background: var(--tg-btn); backdrop-filter: blur(6px); cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background .15s;
+  }
+  .kb button:hover { background: rgba(43, 72, 52, .58); }
+  .kb button.pressed { background: rgba(20, 40, 28, .75); }
+  .msg.flash .bubble { animation: flash .5s ease; }
+  .service { align-self: center; font-size: 13px; font-weight: 600; color: #fff;
+    background: rgba(40, 70, 50, .45); padding: 4px 12px; border-radius: 999px; margin: 4px 0; }
+
+  .invoice .bubble { padding: 0; overflow: hidden; width: 300px; }
+  .inv-top { background: linear-gradient(135deg, #ffcf3f, #ff9d00); padding: 18px 16px; color: #3a2500; }
+  .inv-top .t { font-weight: 800; font-size: 16px; }
+  .inv-top .d { font-size: 13px; margin-top: 4px; opacity: .85; }
+  .inv-body { padding: 12px 16px 6px; display: flex; justify-content: space-between; align-items: baseline; }
+  .inv-body .amt { font-size: 24px; font-weight: 800; }
+  .inv-body .lbl { font-size: 12px; color: var(--tg-sub); }
+  .inv-pay { margin: 6px 10px 10px; width: calc(100% - 20px); border: 0; border-radius: 10px;
+    padding: 11px; font: 700 15px Inter, sans-serif; color: #fff; background: #2ea6ff; cursor: pointer; }
+  .inv-pay[disabled] { background: #9fb7c9; }
+
+  .composer { display: flex; align-items: center; gap: 8px; padding: 8px 10px 24px; background: #fff;
+    border-top: 1px solid #e6ebef; }
+  .composer input { flex: 1; border: 0; outline: 0; font: 15px Inter, sans-serif; padding: 10px 14px;
+    border-radius: 20px; background: #f1f3f5; color: var(--tg-text); }
+  .composer button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: #2ea6ff;
+    color: #fff; font-size: 18px; cursor: pointer; flex: none; }
+
+  .toast { position: absolute; left: 50%; top: 104px; transform: translate(-50%, -12px); opacity: 0;
+    background: rgba(25, 30, 36, .92); color: #fff; padding: 10px 16px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; transition: all .25s ease; pointer-events: none; z-index: 5;
+    max-width: 340px; text-align: center; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .sheet-bg { position: absolute; inset: 0; background: rgba(0,0,0,.35); opacity: 0; pointer-events: none;
+    transition: opacity .25s; z-index: 6; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 22px 22px 0 0;
+    padding: 22px 22px 34px; transform: translateY(100%); transition: transform .3s ease; z-index: 7;
+    text-align: center; color: var(--tg-text); }
+  .sheet.open { transform: translateY(0); }
+  .sheet-bg.open { opacity: 1; pointer-events: auto; }
+  .sheet .star { font-size: 54px; }
+  .sheet h3 { font-size: 20px; margin-top: 6px; }
+  .sheet p { font-size: 15px; color: var(--tg-sub); margin-top: 8px; line-height: 1.4; }
+  .sheet .bal { font-size: 13px; margin-top: 10px; color: var(--tg-sub); }
+  .sheet button { margin-top: 18px; width: 100%; border: 0; border-radius: 12px; padding: 14px;
+    font: 700 16px Inter, sans-serif; color: #fff; background: #2ea6ff; cursor: pointer; }
+  .sheet .ok { font-size: 58px; color: #34c759; }
+
+  .cursor { position: fixed; width: 22px; height: 22px; border-radius: 50%; left: 0; top: 0; z-index: 99;
+    background: rgba(255,255,255,.9); border: 3px solid #2ea6ff; pointer-events: none;
+    transform: translate(-50%, -50%); box-shadow: 0 4px 14px rgba(0,0,0,.4); transition: width .12s, height .12s;
+    display: none; }
+  .cursor.down { width: 16px; height: 16px; background: #2ea6ff; }
+
+  @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
+  @keyframes flash { 0% { filter: brightness(1); } 40% { filter: brightness(.9); } 100% { filter: brightness(1); } }
+
+  @media (max-width: 1300px) {
+    body { overflow: auto; }
+    .stage { grid-template-columns: 1fr; height: auto; gap: 32px; padding: 24px 16px; }
+    .phone { width: min(410px, calc(100vw - 32px)); height: 760px; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <section class="info">
+    <h1>Telegram <span>Shop Bot</span></h1>
+    <p class="lead">A complete store inside Telegram: catalog, cart, checkout with Telegram Stars,
+      instant order alerts for the owner and AI answers to product questions.</p>
+    <ol class="steps" id="steps">
+      <li><b>1</b>Browse the catalog</li>
+      <li><b>2</b>Add to cart</li>
+      <li><b>3</b>Checkout in chat</li>
+      <li><b>4</b>Pay with Telegram Stars ⭐</li>
+      <li><b>5</b>Owner gets the order instantly</li>
+      <li><b>6</b>AI answers product questions</li>
+    </ol>
+    <div class="chips">
+      <span>Python 3</span><span>aiogram 3</span><span>SQLite</span><span>Telegram Payments</span>
+      <span>Claude AI</span><span>pytest</span>
+    </div>
+  </section>
+
+  <div class="phone-wrap">
+    <div class="phone-label">Customer · <i>@alex_buyer</i></div>
+    <div class="phone" id="phone-customer">
+      <div class="screen">
+        <div class="tg-head"><div class="back">‹</div><div class="avatar">☕</div>
+          <div><div class="tg-title">Nordic Roast</div><div class="tg-sub">bot</div></div></div>
+        <div class="chat"></div>
+        <div class="composer"><input placeholder="Message" autocomplete="off"><button aria-label="Send">➤</button></div>
+        <div class="toast"></div>
+        <div class="sheet-bg"></div>
+        <div class="sheet"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone-label">Shop owner · <i>admin</i></div>
+    <div class="phone" id="phone-admin">
+      <div class="screen">
+        <div class="tg-head"><div class="back">‹</div><div class="avatar admin">☕</div>
+          <div><div class="tg-title">Nordic Roast</div><div class="tg-sub">bot · admin notifications</div></div></div>
+        <div class="chat"></div>
+        <div class="composer"><input placeholder="Message" autocomplete="off"><button aria-label="Send">➤</button></div>
+        <div class="toast"></div>
+        <div class="sheet-bg"></div>
+        <div class="sheet"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cursor" id="cursor"></div>
+
+<script>
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const phones = {};
+for (const name of ["customer", "admin"]) {
+  const root = document.getElementById("phone-" + name);
+  phones[name] = {
+    root, chat: root.querySelector(".chat"), sub: root.querySelector(".tg-sub"),
+    input: root.querySelector(".composer input"), send: root.querySelector(".composer button"),
+    toast: root.querySelector(".toast"), sheet: root.querySelector(".sheet"),
+    sheetBg: root.querySelector(".sheet-bg"), subText: root.querySelector(".tg-sub").textContent,
+    nodes: {},
+  };
+}
+let queue = Promise.resolve();
+const enqueue = fn => (queue = queue.then(fn).catch(e => console.error(e)));
+
+function now() { const d = new Date(); return d.toTimeString().slice(0, 5); }
+function esc(s) { return s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+// Bot texts are Telegram HTML produced by our own handlers (user input is escaped server-side).
+function tgHtml(s) {
+  const allowed = /<\/?(b|i|u|s|code|pre)>/g;
+  const parts = []; let last = 0;
+  (s || "").replace(allowed, (m, _t, off) => { parts.push(esc(s.slice(last, off)), m); last = off + m.length; });
+  parts.push(esc((s || "").slice(last)));
+  return parts.join("").replace(/\n/g, "<br>");
+}
+function scrollDown(p) { p.chat.scrollTo({ top: p.chat.scrollHeight, behavior: "smooth" }); }
+
+function keyboard(p, chat, markup, mid) {
+  if (!markup || !markup.length) return null;
+  const kb = document.createElement("div"); kb.className = "kb";
+  for (const row of markup) {
+    const r = document.createElement("div"); r.className = "row";
+    for (const b of row) {
+      const btn = document.createElement("button");
+      btn.textContent = b.text; btn.title = b.text;
+      btn.onclick = () => { btn.classList.add("pressed"); setTimeout(() => btn.classList.remove("pressed"), 300);
+        act(chat, { type: "press", data: b.data, message_id: mid }); };
+      r.appendChild(btn);
+    }
+    kb.appendChild(r);
+  }
+  return kb;
+}
+
+function renderBot(chat, ev) {
+  const p = phones[chat];
+  let node = p.nodes[ev.id];
+  const isNew = !node;
+  if (isNew) { node = document.createElement("div"); node.className = "msg in"; p.nodes[ev.id] = node; }
+  node.innerHTML = "";
+  const bubble = document.createElement("div"); bubble.className = "bubble";
+  bubble.innerHTML = tgHtml(ev.text) + `<span class="time">${now()}</span>`;
+  node.appendChild(bubble);
+  const kb = keyboard(p, chat, ev.markup, ev.id);
+  if (kb) node.appendChild(kb);
+  if (isNew) p.chat.appendChild(node);
+  else { node.classList.remove("flash"); void node.offsetWidth; node.classList.add("flash"); }
+  scrollDown(p);
+}
+
+function renderUser(chat, text) {
+  const p = phones[chat];
+  const node = document.createElement("div"); node.className = "msg out";
+  node.innerHTML = `<div class="bubble">${esc(text)}<span class="time">${now()} ✓✓</span></div>`;
+  p.chat.appendChild(node); scrollDown(p);
+}
+
+function service(chat, text) {
+  const p = phones[chat];
+  const node = document.createElement("div"); node.className = "service"; node.textContent = text;
+  p.chat.appendChild(node); scrollDown(p);
+}
+
+async function toast(chat, text, alert) {
+  const p = phones[chat];
+  p.toast.textContent = text; p.toast.classList.add("show");
+  await sleep(alert ? 2200 : 1500); p.toast.classList.remove("show");
+}
+
+function renderInvoice(chat, ev) {
+  const p = phones[chat];
+  const node = document.createElement("div"); node.className = "msg in invoice";
+  const amount = ev.currency === "XTR" ? `${ev.total} ⭐` : `${(ev.total/100).toFixed(2)} ${ev.currency}`;
+  node.innerHTML = `<div class="bubble"><div class="inv-top"><div class="t">${esc(ev.title)}</div>
+    <div class="d">${esc(ev.description)}</div></div>
+    <div class="inv-body"><div><div class="lbl">Total</div><div class="amt">${amount}</div></div>
+    <div class="lbl">Telegram Stars</div></div>
+    <button class="inv-pay">Pay ${amount}</button></div>`;
+  const btn = node.querySelector(".inv-pay");
+  btn.onclick = () => openSheet(chat, ev, amount, btn);
+  p.chat.appendChild(node); scrollDown(p);
+}
+
+function openSheet(chat, ev, amount, payBtn) {
+  const p = phones[chat];
+  p.sheet.innerHTML = `<div class="star">⭐</div><h3>Confirm your purchase</h3>
+    <p>Buy <b>${esc(ev.title.split("·").pop().trim())}</b><br>for <b>${amount}</b>?</p>
+    <div class="bal">Your balance: 2 500 ⭐</div>
+    <button class="confirm">Confirm and Pay ${amount}</button>`;
+  p.sheet.classList.add("open"); p.sheetBg.classList.add("open");
+  p.sheet.querySelector(".confirm").onclick = async () => {
+    p.sheet.innerHTML = `<div class="ok">✓</div><h3>Payment successful</h3><p>${amount} sent to Nordic Roast</p>`;
+    payBtn.disabled = true; payBtn.textContent = "Paid ✓";
+    await sleep(1200);
+    p.sheet.classList.remove("open"); p.sheetBg.classList.remove("open");
+    act(chat, { type: "pay" });
+  };
+}
+
+async function typing(chat, ms) {
+  const p = phones[chat];
+  p.sub.textContent = "typing…"; p.sub.classList.add("typing");
+  await sleep(ms);
+  p.sub.textContent = p.subText; p.sub.classList.remove("typing");
+}
+
+async function play(events) {
+  for (const ev of events) {
+    const chat = ev.chat || "customer";
+    switch (ev.method) {
+      case "SendMessage": await typing(chat, 280); renderBot(chat, ev); break;
+      case "EditMessageText": case "EditMessageReplyMarkup": renderBot(chat, ev); break;
+      case "AnswerCallbackQuery": toast(chat, ev.text, ev.alert); break;
+      case "SendChatAction": await typing(chat, 900); break;
+      case "SendInvoice": await typing(chat, 280); renderInvoice(chat, ev); break;
+      case "AnswerPreCheckoutQuery": if (!ev.ok) toast(chat, ev.error, true); break;
+    }
+    await sleep(60);
+  }
+}
+
+function act(chat, body) {
+  return enqueue(async () => {
+    const r = await fetch("/api/action", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat, ...body }) });
+    const data = await r.json();
+    await play(data.events || []);
+  });
+}
+
+for (const [chat, p] of Object.entries(phones)) {
+  const submit = () => {
+    const text = p.input.value.trim(); if (!text) return;
+    p.input.value = ""; renderUser(chat, text); act(chat, { type: "text", text });
+  };
+  p.send.onclick = submit;
+  p.input.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+}
+
+// ---- hooks for the recorded walkthrough ----
+window.demo = {
+  idle: () => queue,
+  step(n) {
+    document.querySelectorAll("#steps li").forEach((li, i) => {
+      li.classList.toggle("active", i === n - 1); li.classList.toggle("done", i < n - 1);
+    });
+  },
+  showCursor() { document.getElementById("cursor").style.display = "block"; },
+};
+const cur = document.getElementById("cursor");
+addEventListener("mousemove", e => { cur.style.left = e.clientX + "px"; cur.style.top = e.clientY + "px"; });
+addEventListener("mousedown", () => cur.classList.add("down"));
+addEventListener("mouseup", () => cur.classList.remove("down"));
+
+fetch("/api/reset", { method: "POST" }).then(() => {
+  service("customer", "Today"); service("admin", "Today");
+  phones.admin.chat.insertAdjacentHTML("beforeend",
+    '<div class="msg in"><div class="bubble">🛠 You are the shop admin. New paid orders will appear here.<span class="time">09:00</span></div></div>');
+  window.demoReady = true;
+});
+</script>
+</body>
+</html>
