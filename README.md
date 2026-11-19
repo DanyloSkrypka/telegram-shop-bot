@@ -10,7 +10,7 @@ Product questions are answered by an **AI assistant** (Claude) — with a built-
 
 ▶️ **Full demo video (about 48 s, 1080p 60 fps):**
 
-https://github.com/user-attachments/assets/dfcf65df-ae3c-4479-8123-c492880a5344
+https://github.com/user-attachments/assets/32b2cef1-1917-4018-91d3-481165b9aa16
 
 ## Features
 
