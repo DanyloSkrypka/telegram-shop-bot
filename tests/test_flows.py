@@ -30,7 +30,7 @@ async def checkout(h: Harness):
     await h.click(ALEX, "Cart")
     await h.click(ALEX, "Checkout")
     await h.send(ALEX, "Alex Weber")
-    await h.send(ALEX, "Bahnhofstr. 12, 10115 Berlin, Germany")
+    await h.send(ALEX, "Invalidenstr. 12, 10115 Berlin, Germany")
     await h.click(ALEX, "Pay")
 
 
@@ -67,9 +67,9 @@ async def test_cart_plus_minus_and_total(h):
     sent = await h.click(ALEX, "Cart")
     cart = texts(sent, "EditMessageText")[0]
     assert "× 2 — 300 ⭐" in cart and "Total: 300 ⭐" in cart
-    sent = await h.click(ALEX, "➖")
+    sent = await h.click(ALEX, "−")
     assert "Total: 150 ⭐" in texts(sent, "EditMessageText")[0]
-    await h.click(ALEX, "➖")
+    await h.click(ALEX, "−")
     _, msg = h.last_message(ALEX.id)
     assert "cart is empty" in msg["text"]
 
@@ -93,7 +93,7 @@ async def test_checkout_validation(h):
     assert "at least 2 letters" in texts(await h.send(ALEX, "A"))[0]
     await h.send(ALEX, "Alex Weber")
     assert "too short" in texts(await h.send(ALEX, "Mind"))[0]
-    sent = await h.send(ALEX, "Bahnhofstr. 12, 10115 Berlin, Germany")
+    sent = await h.send(ALEX, "Invalidenstr. 12, 10115 Berlin, Germany")
     summary = texts(sent)[0]
     assert "Alex Weber" in summary and "Berlin" in summary and "Total: 300 ⭐" in summary
 
@@ -117,7 +117,7 @@ async def test_full_purchase_with_stars_and_admin_notification(h):
     assert len(admin_msgs) == 1
     a = admin_msgs[0].payload["text"]
     assert "New paid order" in a and "Ethiopia Yirgacheffe × 2" in a and "@alex_buyer" in a
-    assert "Bahnhofstr. 12" in a
+    assert "Invalidenstr. 12" in a
 
 
 async def test_admin_marks_shipped_and_customer_is_notified(h):

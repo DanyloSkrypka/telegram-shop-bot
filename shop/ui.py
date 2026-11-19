@@ -138,7 +138,7 @@ def products_kb(s: Settings, products: list[Product]) -> InlineKeyboardMarkup:
 def product_kb(p: Product, cart_count: int) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     if p.stock > 0:
-        kb.button(text="➕ Add to cart", callback_data=CartOp(op="add", id=p.id))
+        kb.button(text="+ Add to cart", callback_data=CartOp(op="add", id=p.id))
     kb.button(text="❓ Ask about this product", callback_data=Ask(id=p.id))
     kb.button(text=f"🛒 Cart ({cart_count})" if cart_count else "🛒 Cart",
               callback_data=Nav(to="cart"))
@@ -151,9 +151,9 @@ def cart_kb(items: list[tuple[Product, int]]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     sizes = []
     for p, qty in items:
-        kb.button(text="➖", callback_data=CartOp(op="dec", id=p.id))
+        kb.button(text="−", callback_data=CartOp(op="dec", id=p.id))
         kb.button(text=f"{p.emoji} {qty}", callback_data=Prod(id=p.id))
-        kb.button(text="➕", callback_data=CartOp(op="inc", id=p.id))
+        kb.button(text="+", callback_data=CartOp(op="inc", id=p.id))
         sizes.append(3)
     if items:
         kb.button(text="✅ Checkout", callback_data=Nav(to="checkout"))
